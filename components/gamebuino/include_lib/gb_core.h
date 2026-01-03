@@ -27,6 +27,24 @@ Authors:
 #pragma once
 
 
+class gb_buttons {
+    public:
+            //! update status of buttons, joystick...
+        void update();
+            //! return buttons state, cf GB_KEY_xxx
+        uint16_t state();
+            //! return buttons press event, cf GB_KEY_xxx
+        uint16_t pressed();
+            //! return buttons release event, cf GB_KEY_xxx
+        uint16_t released();
+
+    private:
+        uint16_t u16_buttons {0};
+        uint16_t u16_buttons_last {0};
+
+};
+
+
 class gb_core {
     public:
         gb_core();
@@ -35,8 +53,8 @@ class gb_core {
         void init();
             //! update status of buttons, joystick...
         void pool();
-            //! return buttons state, cf GB_KEY_xxx
-        uint16_t buttons();
+            //! buton management
+        gb_buttons buttons;
             //! Joystick vertical position, from -1000 to 1000
         int16_t joy_y();
             //! Joystick horizontal position, from -1000 to 1000
@@ -56,8 +74,6 @@ class gb_core {
     private:
     int16_t i16_joy_x {0};
     int16_t i16_joy_y {0};
-    uint16_t u16_buttons {0};
-
 };
 
 

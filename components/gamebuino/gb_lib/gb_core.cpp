@@ -72,19 +72,37 @@ void gb_core::init()
 }
 
 
+void gb_buttons::update()
+{
+    u16_buttons_last = u16_buttons;
+    u16_buttons = gb_ll_expander_read() & EXPANDER_KEY;
+    if (u16_buttons & EXPANDER_KEY_RUN)
+        gb_ll_expander_power_off();
+}
+
+uint16_t gb_buttons::state()
+{
+    return u16_buttons;
+}
+
+uint16_t gb_buttons::pressed()
+{
+    return u16_buttons & (~u16_buttons_last);
+}
+
+uint16_t gb_buttons::released()
+{
+    return (~u16_buttons) & u16_buttons_last;
+}
+
+
 void gb_core::pool()
 {
     i16_joy_x = 2000*(gb_ll_adc_read_joyx()-JOYX_MID)/JOYX_MAX;
     i16_joy_y = 2000*(gb_ll_adc_read_joyy()-JOYX_MID)/JOYX_MAX;;
-    u16_buttons = gb_ll_expander_read() & EXPANDER_KEY;
-    if (u16_buttons & EXPANDER_KEY_RUN)
-        power_down();
+    buttons.update();
 }
 
-uint16_t gb_core::buttons()
-{
-    return u16_buttons;
-}
 
 int16_t gb_core::joy_x()
 {
