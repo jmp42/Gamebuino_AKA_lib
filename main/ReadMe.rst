@@ -22,10 +22,8 @@
 
 								
 TODO first !
-	Ajouter les fx system en surcouche Woop, ok, ko, tick, laser, explode ...
 	Bruit de fond casque et scintillement écran
 	test mul div uint32 float32
-	IMPORTANT : Ajouter notion cc by sa sur tout les fichiers gamebuino
 
 #TODO list
 
