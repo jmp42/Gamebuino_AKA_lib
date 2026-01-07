@@ -24,7 +24,7 @@ Authors:
 //#define USE_PSRAM_VIDEO_BUFFER  // alloc 320x240 video buffer in PSRAM, instead or static alloc in DRAM. Less performances, but more free SRAM
 
 //#define USE_VIDEO_256_INDEXED   // use 256 colors video buffer, instead of 65536 colors. less RAM usage, and more preformance, but only 256 colors
-//#define USE_VSYCNC // sync to screen refresh : 70 / 35 .. fps or free FPS
+#define USE_VSYCNC // sync to screen refresh : 70 / 35 .. fps or free FPS
 
 #define ZERO_BUFFER_PSRAM   // 1 SRAM video buffer render directly from SRAM ( no double buffer )
 //#define ONCE_BUFFER_PSRAM   // 1 PSRAM + 1 SRAM video buffer : copy SRAM to PSRAM buffer

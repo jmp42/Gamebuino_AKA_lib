@@ -57,13 +57,16 @@ void LCD_FAST_test(const gb_pixel* u16_pframe_buffer);
 uint32_t LCD_last_refresh_delay();
 
 void lcd_refresh();
+    //! return count of lcd draw since power on
+uint32_t gb_ll_lcd_get_draw_count();
+
 void lcd_clear( uint16_t u16_pix_color );
     // return !0 if last refresh completed
 uint8_t lcd_refresh_completed();
 void lcd_putpixel( uint16_t x, uint16_t y, gb_pixel color );
 gb_pixel lcd_getpixel( uint16_t x, uint16_t y);
 
-void lcd_update_pwm(uint8_t u8_duty);
+void lcd_update_pwm(uint16_t u16_duty);
 
     // RGB 888 to rgb 565
 inline uint16_t lcd_colopr_rgb( uint8_t red, uint8_t green, uint8_t blue )

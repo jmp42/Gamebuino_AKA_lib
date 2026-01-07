@@ -34,16 +34,16 @@ extern "C" void app_main(void)
         uint16_t u16_buttons = core.buttons.pressed();
 
             // play the pmf
-        if ( u16_buttons & GB_KEY_A )
+        if ( u16_buttons & gb_buttons::KEY_A )
             track_pmf.play_pmf();
             // stop the pmf
-        if ( u16_buttons & GB_KEY_B )
+        if ( core.buttons.pressed( gb_buttons::KEY_B ) )
             track_pmf.stop_playing();
 
-        if ( u16_buttons & GB_KEY_C )
+        if ( core.buttons.pressed( gb_buttons::KEY_C ) )
             track_fx.play_fx( gb_fx_system_explode, count_of(gb_fx_system_explode) );
             
-        if ( u16_buttons & GB_KEY_D )
+        if ( core.buttons.pressed( gb_buttons::KEY_D ) )
             track_wav.play_wav( gb_wav_system_laser );
 
         player.pool();                                      // generate samples for both tracks

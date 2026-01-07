@@ -28,10 +28,10 @@ Authors:
 #include "gb_ll_system.h"
 
 
-volatile uint32_t u32_start_refresh = 0;
-volatile uint32_t u32_delta_refresh = 0;
-volatile uint32_t u32_refresh_ctr = 0;
-volatile uint32_t u32_draw_count = 0;
+static volatile uint32_t u32_start_refresh = 0;
+static volatile uint32_t u32_delta_refresh = 0;
+static volatile uint32_t u32_refresh_ctr = 0;
+static volatile uint32_t u32_draw_count = 0;
 
 IRAM_ATTR bool color_trans_done_cb(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) 
 {
@@ -354,11 +354,11 @@ void lcd_set_fps( uint8_t u8_fps )
 
 #define LEDC_TIMER              LEDC_TIMER_0
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
-#define LEDC_OUTPUT_IO          (PWM_LCD_GPIO) // Define the output GPIO
+#define LEDC_OUTPUT_IO          PWM_LCD_GPIO // Define the output GPIO
 #define LEDC_CHANNEL            LEDC_CHANNEL_0
-#define LEDC_DUTY_RES           LEDC_TIMER_8_BIT // Set duty resolution to 13 bits
-#define LEDC_DUTY               (4096) // Set duty to 50%. (2 ** 13) * 50% = 4096
-#define LEDC_FREQUENCY          (PWM_LCD_FREQUENCY) // Frequency in Hertz. Set frequency at 4 kHz
+//#define LEDC_DUTY_RES           LEDC_TIMER_8_BIT // Set duty resolution to 13 bits
+#define LEDC_DUTY_RES           LEDC_TIMER_10_BIT // Set duty resolution to 13 bits
+#define LEDC_FREQUENCY          (PWM_LCD_FREQUENCY) // Frequency in Hertz. Set frequency at 40 kHz
 
 /* Warning:
  * For ESP32, ESP32S2, ESP32S3, ESP32C3, ESP32C2, ESP32C6, ESP32H2, ESP32P4 targets,
@@ -373,7 +373,7 @@ static void lcd_init_pwm()
         .speed_mode       = LEDC_MODE,
         .duty_resolution  = LEDC_DUTY_RES,
         .timer_num        = LEDC_TIMER,
-        .freq_hz          = LEDC_FREQUENCY,  // Set output frequency at 4 kHz
+        .freq_hz          = LEDC_FREQUENCY,  // Set output frequency at 40 kHz
         .clk_cfg          = LEDC_AUTO_CLK
     };
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
@@ -393,9 +393,9 @@ static void lcd_init_pwm()
 
 
 
-void lcd_update_pwm(uint8_t u8_duty)
+void lcd_update_pwm(uint16_t u16_duty)
 {
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, u8_duty));
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, u16_duty));
     // Update duty to apply the new value
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
 }
@@ -430,7 +430,6 @@ void gb_ll_lcd_init()
     ILI9342C_write_cmd( ST7789V_CMD_COLMOD, color_mode, 1);
     ILI9342C_write_cmd( ST7789V_CMD_INVON, 0, 0);
     ILI9342C_write_cmd( ST7789V_CMD_NORON, 0, 0);
-
     st7789v_rotation_set(3);
     set_addr_window(0, 0, 319, 239);
     ILI9342C_write_cmd( ST7789V_CMD_DISPON, 0, 0);
@@ -449,7 +448,7 @@ void gb_ll_lcd_init()
         lcd_refresh();
         while( !lcd_refresh_completed() ); // for simple buffer : wait refresh completed before erase screen buffer
     }
-    lcd_set_fps(50); // default fps
+    lcd_set_fps(100); // default fps
 }
 
 
@@ -472,16 +471,26 @@ uint8_t lcd_refresh_completed()
 {
     return u32_refresh_ctr;
 }
+
+
+
+    //! return count of lcd draw since power on
+uint32_t gb_ll_lcd_get_draw_count()
+{
+    return u32_draw_count;
+}
+
+
 void lcd_refresh()
 {
     while( u32_refresh_ctr == 0 );  // wait last update compleped ( DMA )
     u32_refresh_ctr = 0;            // reset complete dma flag
     #ifdef USE_VSYCNC
       // Sync to Scanline
-    uint64_t start_us = esp_timer_get_time();
+    uint64_t start_us = gb_get_micros();
     while ( digitalRead( LCD_FMARK ) )
     {
-        if ( ( esp_timer_get_time() - start_us ) > 20000 )
+        if ( ( gb_get_micros() - start_us ) > 20000 )
         {
             printf( "ERROR : Loop scanline 1 timeout\n" );
             break;
@@ -489,10 +498,10 @@ void lcd_refresh()
     }
 //    printf( "Loop scanline 1 %lld us\n", esp_timer_get_time() - start_us );
 
-    start_us = esp_timer_get_time();
+    start_us = gb_get_micros();
     while ( digitalRead( LCD_FMARK ) == 0 )
     {
-        if ( ( esp_timer_get_time() - start_us ) > 20000 )
+        if ( ( gb_get_micros() - start_us ) > 20000 )
         {
             printf( "ERROR : Loop scanline 0 timeout\n" );
             break;

@@ -59,7 +59,18 @@ class gb_graphics {
         // draw formated string to screen
     void printf(const char *pc_format, ...);
         //! set brigntness, 0=off, 255=max
-    void set_backlight(uint8_t u8_duty);
+    void set_backlight(uint16_t u16_duty);
+        //! get brigntness, 0=off, 255=max
+    uint16_t get_backlight();
+        //! set as progressive percent 0..100
+    void set_backlight_percent(uint8_t u8_percent);
+        //! get as progressive percent 0..100
+    uint8_t get_backlight_percent();
+        //! set hard fps to @u8_fps, from 40 to 100
+    void set_refresh_rate( uint8_t u8_fps );
+	    //! return fps for last sec
+    float get_fps();
+
         //! trasnfert screen buffer to screen
     void update();
 
@@ -67,6 +78,11 @@ class gb_graphics {
         uint16_t u16_color_pen;
         uint16_t cursor_x = 0;
         uint16_t cursor_y = 0;
+        uint16_t _u16_duty_lcd_pwm;
+        uint8_t _u8_percent_lcd_pwm;
+        uint32_t u32_last_stat_date = 0;
+        uint32_t u32_last_stat_count = 0;
+        float f32_fps_stat = 0;
 };
 
 

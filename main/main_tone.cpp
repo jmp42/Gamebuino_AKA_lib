@@ -41,23 +41,23 @@ extern "C" void app_main(void)
         uint16_t u16_buttons = core.buttons.pressed();
 
             // embeeded fx example sound
-        if ( u16_buttons & GB_KEY_A )
+        if ( u16_buttons & gb_buttons::KEY_A )
             track_fx.play_fx( gb_fx_system_ok, count_of(gb_fx_system_ok) );
-        if ( u16_buttons & GB_KEY_B )
+        if ( u16_buttons & gb_buttons::KEY_B )
             track_fx.play_fx( gb_fx_system_ko, count_of(gb_fx_system_ko) );
-        if ( u16_buttons & GB_KEY_C )
+        if ( u16_buttons & gb_buttons::KEY_C )
             track_fx.play_fx( gb_fx_system_tick, count_of(gb_fx_system_tick) );
-        if ( u16_buttons & GB_KEY_D )
+        if ( u16_buttons & gb_buttons::KEY_D )
             track_fx.play_fx( gb_fx_system_explode, count_of(gb_fx_system_explode) );
 
             // simple tone
-        if (u16_buttons&GB_KEY_UP)   
+        if ( u16_buttons & gb_buttons::KEY_UP )   
             track_tone.play_tone( 600, 800, 0.0, 1.0, 250, gb_audio_track_tone::SINE );
-        if (u16_buttons&GB_KEY_DOWN) 
+        if ( u16_buttons & gb_buttons::KEY_DOWN ) 
             track_tone.play_tone( 440, 220, 1.0, 0.0, 100, gb_audio_track_tone::SQUARE );
-        if (u16_buttons&GB_KEY_LEFT) 
+        if ( u16_buttons & gb_buttons::KEY_LEFT ) 
             track_tone.play_tone( 220, 220, 1.0, 0.0, 500, gb_audio_track_tone::NOISE );
-        if (u16_buttons&GB_KEY_RIGHT) 
+        if ( u16_buttons & gb_buttons::KEY_RIGHT ) 
             track_fx.play_fx( track_my_music, count_of(track_my_music) );
 
         player.pool();                                      // generate samples for both tracks

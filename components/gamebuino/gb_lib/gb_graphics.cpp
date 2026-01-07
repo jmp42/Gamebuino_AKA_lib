@@ -20,6 +20,7 @@ Authors:
  - Jean-Marie Papillon
 */
 #include "gb_graphics.h"
+#include "gb_ll_system.h"
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -397,16 +398,66 @@ static char pc_message_buffer[256];
 }
 
 
-void gb_graphics::set_backlight(uint8_t u8_duty)
+void gb_graphics::set_backlight(uint16_t u16_duty)
 {
-	lcd_update_pwm(u8_duty);
+	_u16_duty_lcd_pwm = u16_duty;
+	lcd_update_pwm(u16_duty);
+}
+
+static const uint16_t lin_to_grad[101] = { 0, 0,	0,	0,	1,	1,	2,	3,	4,	5,	6,	8,	10,	12,	14,	16,	18,	21,	24,	27,	30,	33,	37,	40,	44,	49,	53,	57,	62,	67,	72,	78,	83,	89,	95,	102,	108,	115,	122,	129,	136,	144,	152,	160,	168,	177,	186,	194,	204,	213,	223,	233,	243,	253,	264,	275,	286,	297,	309,	321,	333,	345,	358,	371,	384,	397,	410,	424,	438,	453,	467,	482,	497,	512,	528,	544,	560,	576,	593,	610,	627,	644,	662,	680,	698,	716,	735,	754,	773,	792,	812,	832,	852,	873,	894,	915,	936,	958,	979,	1002,	1024 };
+
+void gb_graphics::set_backlight_percent(uint8_t u8_percent)
+{
+	if ( u8_percent == 255  ) // assume as set_backlight_percent(-1);
+		u8_percent = 0;
+	if ( u8_percent > 100  )
+	u8_percent = 100;
+	_u8_percent_lcd_pwm = u8_percent;
+	set_backlight( lin_to_grad[u8_percent] );
+}
+
+uint8_t gb_graphics::get_backlight_percent()
+{
+	return _u8_percent_lcd_pwm;
 }
 
 
+    //! set hard fps to @u8_fps, from 40 to 100
+void gb_graphics::set_refresh_rate( uint8_t u8_fps )
+{
+	lcd_set_fps(u8_fps);
+}
+
+
+uint16_t gb_graphics::get_backlight()
+{
+	return _u16_duty_lcd_pwm;
+}
+
+/*
+            uint32_t u32_now = core.get_millis();
+            if (( u32_now - u32_start ) > 1000 )
+*/
+
+	//! return fps for last sec
+float gb_graphics::get_fps()
+{
+	return f32_fps_stat;
+}
 void gb_graphics::update()
 {
 	lcd_refresh();
-    while( !lcd_refresh_completed() );
+
+	uint32_t u32_now = gb_get_millis();
+	if ( ( u32_now - u32_last_stat_date ) > 1000 )
+	{
+		uint32_t u32_draw_now = gb_ll_lcd_get_draw_count();
+		f32_fps_stat = 1000.0f*(u32_draw_now - u32_last_stat_count)/((float)(u32_now-u32_last_stat_date)) ;
+		u32_last_stat_date = u32_now;
+		u32_last_stat_count = u32_draw_now;
+	}
+
+	while( !lcd_refresh_completed() );
 }
 
 /*

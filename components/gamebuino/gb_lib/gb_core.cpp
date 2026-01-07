@@ -90,29 +90,47 @@ uint16_t gb_buttons::pressed()
     return u16_buttons & (~u16_buttons_last);
 }
 
+bool gb_buttons::pressed( gb_key key )
+{
+    return (pressed()&key)?true:false;
+}
+
 uint16_t gb_buttons::released()
 {
     return (~u16_buttons) & u16_buttons_last;
 }
 
-
-void gb_core::pool()
+bool gb_buttons::released( gb_key key )
 {
-    i16_joy_x = 2000*(gb_ll_adc_read_joyx()-JOYX_MID)/JOYX_MAX;
-    i16_joy_y = 2000*(gb_ll_adc_read_joyy()-JOYX_MID)/JOYX_MAX;;
-    buttons.update();
+    return (released()&key)?true:false;
 }
 
 
-int16_t gb_core::joy_x()
+int16_t gb_joystick::get_x()
 {
     return i16_joy_x;
 }
 
-int16_t gb_core::joy_y()
+int16_t gb_joystick::get_y()
 {
     return i16_joy_y;
 }
+
+void gb_joystick::update()
+{
+    i16_joy_x = 2000*(gb_ll_adc_read_joyx()-JOYX_MID)/JOYX_MAX;
+    i16_joy_y = 2000*(gb_ll_adc_read_joyy()-JOYX_MID)/JOYX_MAX;;
+}
+
+
+void gb_core::pool()
+{
+    buttons.update();
+    joystick.update();
+}
+
+
+
 
 size_t gb_core::free_psram()
 {

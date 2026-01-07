@@ -50,7 +50,6 @@ class gb_audio_track_base {
 
 #define AUDIO_PLAYER_TRACK_COUNT 4
 class gb_audio_player  {
-    friend class gb_audio_track_base;
     public:
         gb_audio_player();
         ~gb_audio_player() {};

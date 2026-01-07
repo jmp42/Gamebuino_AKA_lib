@@ -26,17 +26,39 @@ Authors:
 
 #pragma once
 
+class gb_joystick {
+    public:
+            //! update status of joystick
+        void update();
+            //! Joystick vertical position, from -1000 to 1000
+        int16_t get_y();
+            //! Joystick horizontal position, from -1000 to 1000
+        int16_t get_x();
+    private:
+        int16_t i16_joy_x {0};
+        int16_t i16_joy_y {0};
+
+};
+
 
 class gb_buttons {
     public:
-            //! update status of buttons, joystick...
+        enum gb_key { KEY_RUN=GB_KEY_RUN, KEY_MENU=GB_KEY_MENU,
+             KEY_L1=GB_KEY_L1, KEY_R1=GB_KEY_R1,
+             KEY_RIGHT=GB_KEY_RIGHT, KEY_UP=GB_KEY_UP, KEY_DOWN=GB_KEY_DOWN, KEY_LEFT=GB_KEY_LEFT, 
+             KEY_A=GB_KEY_A, KEY_B=GB_KEY_B, KEY_C=GB_KEY_C, KEY_D=GB_KEY_D};
+            //! update status of buttons
         void update();
-            //! return buttons state, cf GB_KEY_xxx
+            //! return buttons state, cf gb_buttons::KEY_xxx
         uint16_t state();
-            //! return buttons press event, cf GB_KEY_xxx
+            //! return buttons press event, cf gb_buttons::KEY_xxx
         uint16_t pressed();
-            //! return buttons release event, cf GB_KEY_xxx
+            //! return true if requested button presse, cf gb_buttons::KEY_xxx
+        bool pressed(gb_key key);
+            //! return buttons release event, cf gb_buttons::KEY_xxx
         uint16_t released();
+            //! return true if requested button released, cf gb_buttons::KEY_xxx
+        bool released(gb_key key);
 
     private:
         uint16_t u16_buttons {0};
@@ -55,10 +77,8 @@ class gb_core {
         void pool();
             //! buton management
         gb_buttons buttons;
-            //! Joystick vertical position, from -1000 to 1000
-        int16_t joy_y();
-            //! Joystick horizontal position, from -1000 to 1000
-        int16_t joy_x();
+            //! Jystick management
+        gb_joystick joystick;
             //! delay in milliseconds
         void delay_ms(uint32_t u32_ms);
             //! return date in milliseconds
@@ -72,8 +92,6 @@ class gb_core {
             //! power down 
         void power_down();    
     private:
-    int16_t i16_joy_x {0};
-    int16_t i16_joy_y {0};
 };
 
 

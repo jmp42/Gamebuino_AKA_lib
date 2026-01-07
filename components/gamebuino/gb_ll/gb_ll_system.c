@@ -50,7 +50,17 @@ IRAM_ATTR int64_t gb_get_micros()
     return esp_timer_get_time();
 } 
 
+#include <esp_pm.h>
+
+esp_pm_config_esp32s3_t pm_config = {
+    .max_freq_mhz = 240,
+    .min_freq_mhz = 80,
+    .light_sleep_enable = true
+};
+
 void gb_ll_system_init()
 {
     esp_timer_early_init();
+    esp_pm_configure( &pm_config );
 }
+
